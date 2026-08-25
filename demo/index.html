@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Agente Cotizador de Equipos Médicos — Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #111827;
+    --bubble-user: #2563eb;
+    --bubble-agent: #1f2937;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --accent: #38bdf8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, sans-serif;
+    background: linear-gradient(180deg, #0b1220, #0f172a 40%);
+    color: var(--text); min-height: 100vh; display: flex;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .app {
+    width: 100%; max-width: 720px; background: var(--panel);
+    border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    overflow: hidden; border: 1px solid #1f2937;
+  }
+  header {
+    padding: 18px 22px; border-bottom: 1px solid #1f2937;
+    display: flex; align-items: center; gap: 12px;
+  }
+  header .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  header p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+  #chat { height: 460px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 78%; padding: 10px 14px; border-radius: 14px; line-height: 1.4; font-size: 14px; white-space: pre-wrap; }
+  .msg.user { align-self: flex-end; background: var(--bubble-user); color: white; border-bottom-right-radius: 4px; }
+  .msg.agent { align-self: flex-start; background: var(--bubble-agent); border: 1px solid #263042; border-bottom-left-radius: 4px; }
+  .msg a { color: var(--accent); }
+  form { display: flex; gap: 10px; padding: 16px; border-top: 1px solid #1f2937; }
+  input {
+    flex: 1; background: #0b1220; border: 1px solid #263042; color: var(--text);
+    padding: 12px 14px; border-radius: 10px; font-size: 14px; outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  button {
+    background: var(--accent); color: #06202f; border: none; border-radius: 10px;
+    padding: 0 18px; font-weight: 600; cursor: pointer;
+  }
+  button:hover { filter: brightness(1.05); }
+  .hint { font-size: 11px; color: var(--muted); padding: 0 20px 14px; }
+  .quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 12px; }
+  .quick button {
+    background: transparent; border: 1px solid #263042; color: var(--muted);
+    font-weight: 400; padding: 6px 10px; border-radius: 999px; font-size: 12px;
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="dot"></div>
+      <div>
+        <h1>Agente Cotizador de Equipos Médicos</h1>
+        <p>Demo del webinar — Agentes de IA en producción con AWS</p>
+      </div>
+    </header>
+    <div id="chat"></div>
+    <div class="quick">
+      <button type="button" data-msg="Necesito cotizar un ecógrafo">Ecógrafo</button>
+      <button type="button" data-msg="Quiero cotizar un monitor de signos vitales">Monitor</button>
+      <button type="button" data-msg="Necesito un desfibrilador">Desfibrilador</button>
+    </div>
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="Escribe tu mensaje..." />
+      <button type="submit">Enviar</button>
+    </form>
+    <div class="hint">API: <code id="api-url"></code> · session_id: <code id="sid"></code></div>
+  </div>
+
+<script>
+  const API_BASE = window.location.origin;
+  document.getElementById("api-url").textContent = API_BASE + "/chat";
+  const sessionId = "demo-" + Math.random().toString(36).slice(2, 8);
+  document.getElementById("sid").textContent = sessionId;
+
+  const chat = document.getElementById("chat");
+  const form = document.getElementById("form");
+  const input = document.getElementById("input");
+
+  function addMsg(text, who) {
+    const div = document.createElement("div");
+    div.className = "msg " + who;
+    div.innerHTML = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function send(mensaje) {
+    addMsg(mensaje, "user");
+    input.value = "";
+    try {
+      const res = await fetch(API_BASE + "/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, mensaje }),
+      });
+      const data = await res.json();
+      let html = data.respuesta.replace(/\n/g, "<br>");
+      if (data.cotizacion_pdf) {
+        html += `<br><br>📄 <a href="${API_BASE}/cotizaciones/${data.cotizacion_pdf}" target="_blank">Descargar cotización (PDF)</a>`;
+      }
+      addMsg(html, "agent");
+    } catch (err) {
+      addMsg("⚠️ No se pudo contactar al agente. Verifica que el servidor esté corriendo (uvicorn app.main:app).", "agent");
+    }
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (input.value.trim()) send(input.value.trim());
+  });
+
+  document.querySelectorAll(".quick button").forEach((b) => {
+    b.addEventListener("click", () => send(b.dataset.msg));
+  });
+
+  addMsg("Hola 👋 Soy el agente cotizador de equipos médicos. Cuéntame qué equipo necesitas cotizar.", "agent");
+</script>
+</body>
+</html>
