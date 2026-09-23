@@ -145,7 +145,7 @@ El checkpointer de conversación soporta dos backends (ver `app/main.py` y
 
 ## 4bis. Frontend estático (presentación + demo web) vía S3 + CloudFront
 
-El frontend estático (`demo/index.html` y `presentation/index.html`) se
+El frontend estático (`demo/index.html` y `presentation/presentacion_webinar.html`) se
 despliega **por separado** del backend, en un bucket S3 privado servido por
 una distribución de CloudFront (mismo patrón que ya usa el autor en otros
 proyectos: S3 + CloudFront, invalidando la caché en cada deploy). El backend
