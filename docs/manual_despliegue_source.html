@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual de despliegue en AWS y GCP con Docker y GitHub</title>
+<style>
+  :root{
+    --ink:#1a2140; --muted:#5a6485; --line:#dfe3ee; --accent:#2563eb;
+    --accent-bg:#eef3ff; --good:#0f766e; --warn:#b45309; --code-bg:#0f1730;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:"Segoe UI",Calibri,Arial,sans-serif; color:var(--ink);
+    font-size:12.5px; line-height:1.55; margin:0; background:#fff;
+  }
+  .page{max-width:760px;margin:0 auto;padding:36px 8px;}
+  h1{font-size:26px;margin:0 0 6px;font-weight:800;letter-spacing:-.01em;}
+  h2.part{
+    font-size:20px;margin:0 0 4px;font-weight:800;color:var(--accent);
+    padding-top:6px;
+  }
+  h3{font-size:15px;margin:22px 0 8px;font-weight:700;}
+  h4{font-size:13.5px;margin:16px 0 6px;font-weight:700;color:var(--ink);}
+  p{margin:0 0 10px;}
+  .subtitle{color:var(--muted);font-size:14px;margin-bottom:4px;}
+  .muted{color:var(--muted);}
+  .cover{
+    text-align:center;padding-top:22vh;page-break-after:always;
+  }
+  .cover .kicker{
+    display:inline-block;color:var(--accent);font-weight:700;font-size:11.5px;
+    letter-spacing:.14em;text-transform:uppercase;background:var(--accent-bg);
+    border-radius:999px;padding:6px 16px;margin-bottom:22px;
+  }
+  .cover h1{font-size:30px;max-width:520px;margin:0 auto 14px;}
+  .cover .subtitle{font-size:15px;max-width:480px;margin:0 auto 30px;}
+  .cover .meta{margin-top:60px;color:var(--muted);font-size:13px;}
+  .cover .meta b{color:var(--ink);display:block;font-size:15px;margin-bottom:2px;}
+
+  .toc{page-break-after:always;}
+  .toc ol{padding-left:22px;}
+  .toc li{margin-bottom:8px;font-size:13.5px;}
+  .toc .sec{color:var(--muted);font-size:12px;}
+
+  section.part{page-break-before:always;padding-top:8px;}
+  section.part:first-of-type{page-break-before:auto;}
+
+  .box{
+    background:var(--accent-bg);border:1px solid #c7d7fb;border-radius:10px;
+    padding:12px 16px;margin:14px 0;
+  }
+  .box.good{background:#ecfdf5;border-color:#a7f3d0;}
+  .box.warn{background:#fffbeb;border-color:#fde68a;}
+  .box h4{margin-top:0;}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px;}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top;}
+  th{background:#f3f5fb;font-weight:700;}
+
+  code{
+    background:#eef1f8;border-radius:4px;padding:1px 5px;font-family:Consolas,Menlo,monospace;
+    font-size:11.5px;
+  }
+  pre{
+    background:var(--code-bg);color:#e6ebff;border-radius:8px;padding:12px 14px;
+    overflow-x:auto;font-size:11px;line-height:1.5;margin:10px 0;
+  }
+  pre code{background:none;color:inherit;padding:0;}
+
+  ol,ul{padding-left:20px;margin:0 0 10px;}
+  li{margin-bottom:5px;}
+
+  .steps{counter-reset:step;list-style:none;padding-left:0;}
+  .steps li{
+    position:relative;padding-left:30px;margin-bottom:10px;
+  }
+  .steps li::before{
+    counter-increment:step;content:counter(step);position:absolute;left:0;top:0;
+    width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  }
+
+  footer.pf{
+    margin-top:28px;padding-top:10px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:10.5px;display:flex;justify-content:space-between;
+  }
+
+  @media print{
+    .page{max-width:none;padding:0;}
+    a{color:inherit;text-decoration:none;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- PORTADA -->
+  <div class="cover">
+    <div class="kicker">Anexo técnico</div>
+    <h1>Manual de despliegue en AWS y GCP con Docker y GitHub</h1>
+    <div class="subtitle">Guía paso a paso para llevar el agente cotizador de equipos médicos
+    a producción sin costo, usando control de versiones, contenedores y dos proveedores de nube.</div>
+    <div class="meta">
+      Webinar: Desarrollo y Puesta en Producción de Agentes de Inteligencia Artificial con AWS<br>
+      <b>Luis David Chuquín Itas</b>
+      Instituto Superior Tecnológico Cenestur · Quito, Ecuador · 2026
+    </div>
+  </div>
+
+  <!-- ÍNDICE -->
+  <div class="toc">
+    <h2 class="part">Índice</h2>
+    <ol>
+      <li>Introducción y alcance de este manual</li>
+      <li>Crear tus cuentas en la nube <span class="sec">— AWS y GCP, y qué créditos dan a cuentas nuevas</span></li>
+      <li>Docker <span class="sec">— empaquetar el agente en un contenedor</span></li>
+      <li>GitHub <span class="sec">— control de versiones y base del despliegue continuo</span></li>
+      <li>Despliegue en AWS <span class="sec">— CloudFront (usado) y la ruta completa con ECS Fargate</span></li>
+      <li>Despliegue en GCP <span class="sec">— Cloud Run</span></li>
+      <li>Costos y opciones gratuitas <span class="sec">— tabla resumen</span></li>
+      <li>Arquitectura final usada en este proyecto</li>
+      <li>Referencias</li>
+    </ol>
+  </div>
+
+  <!-- 1. INTRODUCCIÓN -->
+  <section class="part">
+    <h2 class="part">1. Introducción y alcance de este manual</h2>
+    <p>Este documento es un anexo técnico complementario a la propuesta del webinar
+    <i>"Desarrollo y Puesta en Producción de Agentes de Inteligencia Artificial con AWS"</i>.
+    Su objetivo es dejar un registro reproducible de cómo llevar el agente cotizador de
+    equipos médicos —o un proyecto similar— desde el código fuente hasta una URL pública
+    funcionando, usando únicamente herramientas con capa gratuita: <b>GitHub</b> (control de
+    versiones y disparo del despliegue), <b>Docker</b> (empaquetado del servicio) y dos
+    proveedores de nube, <b>AWS</b> y <b>GCP</b>, evaluados en paralelo durante este proyecto.</p>
+    <p>No es un manual genérico de "qué es la nube": asume que quien lo lee ya vio la
+    explicación conceptual del webinar, y aquí se profundiza en el cómo, con comandos reales
+    y las decisiones que se tomaron —incluyendo los obstáculos que aparecieron y cómo se
+    resolvieron, porque también son parte del aprendizaje.</p>
+  </section>
+
+  <!-- 2. CUENTAS -->
+  <section class="part">
+    <h2 class="part">2. Crear tus cuentas en la nube</h2>
+
+    <h3>2.1 Cuenta de AWS</h3>
+    <ol class="steps">
+      <li>Entra a <code>https://aws.amazon.com/</code> y haz clic en "Crear una cuenta de AWS".</li>
+      <li>Regístrate con un correo electrónico y define el nombre de la cuenta (esta será tu
+      cuenta <b>root</b>, con acceso total — úsala solo para tareas administrativas, no para
+      el día a día).</li>
+      <li>AWS pide una tarjeta de crédito/débito para verificar identidad, incluso en el plan
+      gratuito. Realiza un cargo pequeño temporal (usualmente reversado) para confirmarla.</li>
+      <li>Verifica tu identidad por teléfono (llamada o SMS con un código).</li>
+      <li>Elige un plan de soporte — "Basic support - Free" es suficiente para empezar.</li>
+      <li>Crea un usuario IAM aparte para trabajar (nunca uses las credenciales root en el día
+      a día) con permisos acotados a lo que vayas a usar (ver sección 5).</li>
+    </ol>
+    <div class="box good">
+      <h4>💰 Créditos para cuentas nuevas de AWS</h4>
+      <p>Desde julio de 2025, las cuentas nuevas reciben <b>USD 100</b> de crédito al
+      registrarse, y pueden llegar a <b>USD 200</b> completando actividades de incorporación
+      (por ejemplo, usar EC2 o Bedrock). El plan gratuito dura hasta <b>6 meses o hasta que se
+      agote el crédito</b>, lo que ocurra primero. Además de esto, más de 30 servicios tienen
+      una capa <b>"Always Free"</b> que no depende de esos créditos ni de la antigüedad de la
+      cuenta — por ejemplo, CloudFront (1&nbsp;TB de salida + 10 millones de solicitudes al mes,
+      para siempre). Este proyecto se apoya en esa capa permanente, no en los créditos de
+      bienvenida.</p>
+    </div>
+
+    <h3>2.2 Cuenta de GCP (Google Cloud)</h3>
+    <ol class="steps">
+      <li>Entra a <code>https://console.cloud.google.com/</code> con una cuenta de Google
+      (Gmail u otra) — de preferencia una <b>personal</b>, distinta de tu correo de trabajo si
+      aplica, para no mezclar proyectos.</li>
+      <li>Acepta activar la "Prueba gratuita" cuando el asistente te lo proponga.</li>
+      <li>Se te pedirá una tarjeta para verificación — GCP aclara explícitamente que
+      <b>no cobra automáticamente</b> al terminar la prueba; hay que activar manualmente un
+      plan de pago para seguir usando el servicio después.</li>
+      <li>Crea un proyecto nuevo (<code>gcloud projects create &lt;id&gt;</code> o desde la
+      consola) para aislar este trabajo de cualquier otro proyecto que ya tengas.</li>
+      <li>Vincula una cuenta de facturación al proyecto — es un requisito técnico de casi
+      todos los servicios de cómputo (incluido Cloud Run), incluso si te vas a quedar dentro
+      de la capa gratuita.</li>
+    </ol>
+    <div class="box good">
+      <h4>💰 Créditos para cuentas nuevas de GCP</h4>
+      <p>Las cuentas nuevas de Google Cloud reciben <b>USD 300</b> en créditos, válidos por
+      <b>90 días</b>. Aparte de esa prueba, GCP también mantiene un nivel <b>"Always Free"</b>
+      permanente en varios servicios — el relevante para este proyecto es
+      <b>Cloud Run</b>: 2 millones de solicitudes, 180.000 vCPU-segundos y 360.000 GiB-segundos
+      de memoria al mes, para siempre, independientemente de los créditos de bienvenida.</p>
+    </div>
+    <div class="box warn">
+      <h4>⚠️ Con qué se puede tropezar</h4>
+      <p>Si la cuenta de facturación de un proyecto queda <b>cerrada</b> (por ejemplo, tras
+      cancelar una tarjeta), habilitar cualquier servicio de cómputo —incluido Cloud Run—
+      falla con <code>Billing account ... is not found</code> hasta reactivarla o vincular una
+      nueva desde <code>https://console.cloud.google.com/billing</code>. En AWS, de forma
+      similar, una cuenta puede quedar con un bloqueo de <i>"debe verificarse"</i> para crear
+      ciertos recursos nuevos (en este proyecto ocurrió con CloudFront) — se resuelve
+      generalmente desde la propia consola o abriendo un caso en AWS Support, no es un
+      problema de permisos ni de código.</p>
+    </div>
+  </section>
+
+  <!-- 3. DOCKER -->
+  <section class="part">
+    <h2 class="part">3. Docker: empaquetar el agente en un contenedor</h2>
+    <p><b>¿Qué es Docker?</b> Una herramienta que empaqueta una aplicación junto con todo lo
+    que necesita para correr (versión de Python, librerías, configuración del sistema) en una
+    unidad llamada <b>imagen</b>. Un contenedor es una instancia en ejecución de esa imagen.
+    La ventaja central: si la imagen corre en tu laptop, corre exactamente igual en cualquier
+    servidor, nube o plataforma que sepa ejecutar contenedores — se elimina el clásico
+    "en mi máquina sí funciona".</p>
+    <p><b>¿Por qué es gratis?</b> Docker Engine (el motor que construye y corre contenedores)
+    es de código abierto y gratuito. Docker Desktop (la app con interfaz gráfica) tiene un
+    plan free para uso personal/educativo. No se paga nada por usar contenedores en sí — lo
+    que cuesta, si acaso, es el cómputo donde terminan corriendo (un servidor, un servicio de
+    nube).</p>
+
+    <h3>El Dockerfile de este proyecto, explicado</h3>
+    <pre><code>FROM python:3.11-slim              # imagen base: Python 3.11, ligera
+
+ENV PYTHONDONTWRITEBYTECODE=1      # no genera archivos .pyc
+ENV PYTHONUNBUFFERED=1             # logs salen al instante (no en buffer)
+
+WORKDIR /app                       # carpeta de trabajo dentro del contenedor
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt   # instala dependencias
+
+COPY . .                           # copia el resto del código
+
+RUN mkdir -p /app/data/quotes      # carpeta para los PDF generados
+
+EXPOSE 8080                        # documenta el puerto que usa el servicio
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]</code></pre>
+    <p class="muted">El <code>${PORT:-8080}</code> del último paso es lo que permite que la
+    misma imagen funcione tanto en local (puerto 8080 fijo) como en plataformas que asignan su
+    propio puerto dinámicamente, como Render.</p>
+
+    <h3>Construir y probar la imagen en local</h3>
+    <pre><code>docker build -t agente-cotizador-webinar .
+docker run -p 8080:8080 agente-cotizador-webinar
+curl http://localhost:8080/health</code></pre>
+  </section>
+
+  <!-- 4. GITHUB -->
+  <section class="part">
+    <h2 class="part">4. GitHub: control de versiones y base del despliegue</h2>
+    <p><b>¿Qué es y por qué importa aquí?</b> GitHub aloja el código fuente con control de
+    versiones (Git): cada cambio queda registrado, es reversible, y varias personas pueden
+    colaborar sin pisarse el trabajo. Pero en un despliegue moderno, GitHub cumple un segundo
+    rol igual de importante: es la <b>fuente de verdad</b> desde la que las plataformas de
+    hosting (Render, y en general cualquier proveedor con integración continua) construyen y
+    publican la aplicación automáticamente.</p>
+
+    <h3>Cómo funciona el flujo en este proyecto</h3>
+    <ol class="steps">
+      <li>El código vive en <code>https://github.com/mathsci-2510/agente-cotizador-webinar</code>.</li>
+      <li>Cada <code>git push</code> a la rama principal notifica a Render mediante un webhook.</li>
+      <li>Render clona el repositorio, detecta el <code>Dockerfile</code> y construye la
+      imagen automáticamente — sin que nadie suba manualmente ningún artefacto.</li>
+      <li>Si la construcción y el healthcheck (<code>/health</code>) pasan, Render reemplaza
+      la versión anterior sin caída de servicio perceptible.</li>
+    </ol>
+    <p>Este patrón —código en git, build automático en cada push— es la base de lo que en la
+    industria se llama <b>CI/CD</b> (integración y despliegue continuos). No hace falta un
+    servidor propio de CI: la mayoría de plataformas gratuitas (Render, GitHub Pages, Vercel,
+    Cloud Run con Cloud Build) ya lo incluyen al conectar el repositorio.</p>
+
+    <div class="box">
+      <h4>🔒 Buenas prácticas aplicadas en este repo</h4>
+      <ul>
+        <li><code>.gitignore</code> excluye <code>.env</code>, la base de datos SQLite local
+        y los PDF generados — nada de eso debe viajar al repositorio.</li>
+        <li>Los secretos reales (claves de API, contraseñas de Redis) solo existen como
+        variables de entorno en la plataforma de hosting, nunca como texto en el código.</li>
+        <li>Repositorios públicos en GitHub son gratis sin límite; los privados también lo son
+        para cuentas personales, con colaboradores ilimitados.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5. AWS -->
+  <section class="part">
+    <h2 class="part">5. Despliegue en AWS</h2>
+    <p>Se evaluaron dos rutas. Este proyecto terminó usando la primera por ser la más barata y
+    rápida de poner en marcha; la segunda queda documentada como la forma "completa" de
+    hacerlo si se necesita más control (por ejemplo, para una carga de tráfico real, no solo
+    una demo).</p>
+
+    <h3>5.1 Ruta usada: CloudFront como entrada pública (gratis)</h3>
+    <p>CloudFront es la red de distribución de contenido (CDN) de AWS: entrega contenido desde
+    ubicaciones ("edge locations") cercanas a cada usuario, y también puede actuar como un
+    proxy HTTPS hacia cualquier origen — en este caso, el backend desplegado en Render (ver
+    sección 6 y 7).</p>
+    <pre><code># Crear la distribución (origen: el backend ya desplegado en Render)
+aws cloudfront create-distribution \
+  --distribution-config file://cf-distribution-config.json \
+  --profile &lt;tu-perfil&gt;
+
+# Verificar que terminó de propagarse (puede tardar 5-15 min)
+aws cloudfront get-distribution --id &lt;ID&gt; \
+  --query 'Distribution.Status' --profile &lt;tu-perfil&gt;</code></pre>
+    <div class="box warn">
+      <h4>⚠️ Detalle importante si el origen es una plataforma multi-tenant (Render, Vercel...)</h4>
+      <p>La política de origin request debe ser <b>"Managed-AllViewerExceptHostHeader"</b>,
+      no "AllViewer". Con "AllViewer", CloudFront reenvía el header <code>Host</code> del
+      visitante (el dominio de CloudFront) en vez del dominio real del origen, y plataformas
+      que enrutan por ese header responden 502. Con "AllViewerExceptHostHeader", CloudFront
+      corrige el <code>Host</code> automáticamente al del origen.</p>
+    </div>
+
+    <h3>5.2 Ruta completa 100% AWS: ECR + ECS Fargate + ALB</h3>
+    <p>Para no depender de un tercero (Render), la aplicación puede correr enteramente dentro
+    de AWS:</p>
+    <ol class="steps">
+      <li><b>ECR</b> (Elastic Container Registry): registro privado donde se publica la
+      imagen Docker construida en la sección 3.</li>
+      <li><b>ECS Fargate</b>: ejecuta el contenedor sin administrar servidores — se define
+      cuánta CPU/memoria necesita y AWS se encarga del resto.</li>
+      <li><b>Application Load Balancer (ALB)</b>: reparte el tráfico entrante hacia las
+      instancias del contenedor y expone un DNS público estable.</li>
+      <li><b>Secrets Manager</b>: guarda credenciales (API keys, contraseñas) sin exponerlas
+      en variables de entorno planas ni en el código.</li>
+      <li><b>CloudWatch</b>: recibe los logs automáticamente y permite configurar alarmas
+      (por ejemplo, si <code>/health</code> deja de responder).</li>
+    </ol>
+    <div class="box warn">
+      <h4>💵 Esta ruta no es gratis</h4>
+      <p>A diferencia de CloudFront, el ALB tiene un costo fijo (~USD 16-20/mes) incluso sin
+      tráfico, y Fargate cobra por tiempo de cómputo reservado. Para una demo puntual como la
+      de este webinar no se justificó ese gasto — por eso se usó la ruta 5.1. El comando de
+      referencia completo está en <code>infra/DEPLOY_AWS.md</code> del repositorio.</p>
+    </div>
+  </section>
+
+  <!-- 6. GCP -->
+  <section class="part">
+    <h2 class="part">6. Despliegue en GCP: Cloud Run</h2>
+    <p>Cloud Run es el servicio "serverless" de contenedores de Google Cloud: recibe una
+    imagen Docker, la ejecuta bajo demanda, y <b>escala a cero</b> cuando nadie la está usando
+    — es decir, no se paga nada mientras no hay tráfico. Se evaluó como alternativa a Render
+    precisamente por su capa gratuita permanente.</p>
+    <pre><code># 1. Autenticarse con la cuenta que va a usarse para este proyecto
+gcloud auth login
+
+# 2. Crear un proyecto dedicado (evita mezclar con otros proyectos personales/de trabajo)
+gcloud projects create agente-cotizador-webinar --name="Agente Cotizador Webinar"
+gcloud config set project agente-cotizador-webinar
+
+# 3. Habilitar el servicio (requiere facturación vinculada, ver sección 2.2)
+gcloud services enable run.googleapis.com
+
+# 4. Desplegar directo desde el código fuente (Cloud Build construye la imagen)
+gcloud run deploy agente-cotizador-webinar \
+  --source . \
+  --region us-east1 \
+  --allow-unauthenticated \
+  --port 8080</code></pre>
+    <div class="box warn">
+      <h4>⚠️ Lo que se encontró en este proyecto</h4>
+      <p>El paso 3 falló con <code>Billing account for project ... is not found</code>: la
+      cuenta de facturación de la cuenta de Google usada estaba cerrada, y reactivarla exigía
+      un cargo temporal de verificación de tarjeta. Se decidió no proceder por esa vía para
+      este proyecto puntual — el proyecto <code>agente-cotizador-webinar</code> quedó creado
+      en GCP, listo para retomarse si en el futuro se resuelve la facturación.</p>
+    </div>
+  </section>
+
+  <!-- 7. COSTOS -->
+  <section class="part">
+    <h2 class="part">7. Costos y opciones gratuitas — resumen</h2>
+    <table>
+      <tr><th>Herramienta / servicio</th><th>¿Cuesta algo?</th><th>Detalle</th></tr>
+      <tr><td>GitHub</td><td>Gratis</td><td>Repos públicos y privados ilimitados, colaboradores ilimitados.</td></tr>
+      <tr><td>Docker</td><td>Gratis</td><td>Motor y CLI de código abierto; Docker Desktop free para uso personal.</td></tr>
+      <tr><td>Render (backend usado en este proyecto)</td><td>Gratis</td><td>750h/mes, sin tarjeta; se "duerme" tras ~15 min sin tráfico.</td></tr>
+      <tr><td>AWS CloudFront (usado en este proyecto)</td><td>Gratis (permanente)</td><td>1&nbsp;TB de salida + 10M solicitudes/mes, para siempre, cualquier cuenta.</td></tr>
+      <tr><td>AWS ECS Fargate + ALB (alternativa no usada)</td><td>De pago</td><td>~USD 25-35/mes corriendo continuamente.</td></tr>
+      <tr><td>GCP Cloud Run (evaluado, no desplegado)</td><td>Gratis (permanente), requiere tarjeta verificada</td><td>2M solicitudes + 180.000 vCPU-s/mes, para siempre.</td></tr>
+      <tr><td>Redis Cloud (checkpointer, opcional)</td><td>Gratis</td><td>Plan free de Redis Cloud, suficiente para una demo.</td></tr>
+      <tr><td>Cloudflare Tunnel (respaldo usado durante pruebas)</td><td>Gratis</td><td>Sin cuenta; URL temporal, no apto para dejarlo corriendo días.</td></tr>
+    </table>
+  </section>
+
+  <!-- 8. ARQUITECTURA FINAL -->
+  <section class="part">
+    <h2 class="part">8. Arquitectura final usada en este proyecto</h2>
+    <div class="box good">
+      <p style="margin:0;font-size:13.5px;">
+      <b>GitHub</b> (código + build automático)
+      → <b>Docker</b> (imagen construida desde el <code>Dockerfile</code>)
+      → <b>Render.com</b> (ejecuta el contenedor, free tier)
+      → <b>AWS CloudFront</b> (entrada pública HTTPS, free tier permanente)
+      → usuario final.
+      </p>
+    </div>
+    <p>Costo total de esta arquitectura: <b>USD 0</b>. GCP Cloud Run quedó evaluado y
+    documentado como alternativa (secciones 2.2 y 6), con un proyecto ya creado, para el caso
+    en que se resuelva su facturación más adelante.</p>
+  </section>
+
+  <!-- 9. REFERENCIAS -->
+  <section class="part">
+    <h2 class="part">9. Referencias</h2>
+    <ul>
+      <li>AWS Free Tier — <code>https://aws.amazon.com/free/</code></li>
+      <li>Google Cloud Free Program — <code>https://cloud.google.com/free</code></li>
+      <li>Documentación de Docker — <code>https://docs.docker.com/</code></li>
+      <li>Documentación de GitHub — <code>https://docs.github.com/</code></li>
+      <li>Render — <code>https://render.com/docs</code></li>
+      <li>Repositorio del proyecto — <code>https://github.com/mathsci-2510/agente-cotizador-webinar</code></li>
+    </ul>
+    <footer class="pf">
+      <span>Manual de despliegue — Agente cotizador de equipos médicos</span>
+      <span>Luis David Chuquín Itas · 2026</span>
+    </footer>
+  </section>
+
+</div>
+</body>
+</html>
