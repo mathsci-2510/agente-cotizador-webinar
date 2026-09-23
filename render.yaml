@@ -14,7 +14,7 @@ services:
       - key: APP_NAME
         value: Agente Cotizador de Equipos Médicos
       - key: COMPANY_DISPLAY_NAME
-        value: Demo Webinar - Agentes de IA con AWS
+        value: Demo Webinar - Agentes de IA en la Nube
       - key: OPENAI_API_KEY
         sync: false
       - key: REDIS_URL

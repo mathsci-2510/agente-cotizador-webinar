@@ -49,7 +49,7 @@ settings = Settings(
     openai_temperature=float(_clean("OPENAI_TEMPERATURE", "0.2")),
     checkpoint_db_path=_clean("CHECKPOINT_DB_PATH", str(BASE_DIR / "data" / "checkpoints.sqlite")),
     quotes_dir=_clean("QUOTES_DIR", str(BASE_DIR / "data" / "quotes")),
-    company_display_name=_clean("COMPANY_DISPLAY_NAME", "Demo Webinar - Agentes de IA con AWS"),
+    company_display_name=_clean("COMPANY_DISPLAY_NAME", "Demo Webinar - Agentes de IA en la Nube"),
     redis_url=_clean("REDIS_URL", ""),
 )
 

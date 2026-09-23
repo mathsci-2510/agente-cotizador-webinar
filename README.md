@@ -1,7 +1,7 @@
 # Agente Cotizador de Equipos Médicos — Demo del Webinar
 
 Caso de aplicación práctico para el webinar *"Desarrollo y Puesta en
-Producción de Agentes de Inteligencia Artificial con AWS"* (Cenestur).
+Producción de Agentes de Inteligencia Artificial en la Nube"* (Cenestur).
 
 Un agente conversacional que recopila los requerimientos de un cliente
 (equipo, cantidad, ciudad, contacto) y genera automáticamente una

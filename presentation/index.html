@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Webinar — Agentes de IA en Producción con AWS</title>
+<title>Webinar — Agentes de IA en Producción en la Nube</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root{
@@ -122,7 +122,7 @@
       <div class="inst">Instituto Superior Tecnológico Cenestur</div>
       <div class="career">Tecnología Superior en Big Data e Inteligencia de Negocio</div>
       <div class="tag">Webinar</div>
-      <h1>Desarrollo y Puesta en Producción de Agentes de Inteligencia Artificial con AWS</h1>
+      <h1>Desarrollo y Puesta en Producción de Agentes de Inteligencia Artificial en la Nube</h1>
       <div class="subtitle" style="margin:18px auto 0;text-align:center;">Caso de aplicación: agente cotizador de equipos médicos</div>
       <div class="by">Presentado por<b>Luis David Chuquín Itas</b></div>
       <div class="tutor">Tutor: MSc. Freddy León Cruz &nbsp;·&nbsp; Quito, Ecuador</div>
@@ -141,7 +141,7 @@
       <div class="agenda-row"><div class="n">05</div><div><div class="t">Desarrollo</div><div class="d">Conceptos, arquitectura, caso del cotizador, AWS y demo en vivo</div></div><div class="time">22:00–39:00</div></div>
       <div class="agenda-row"><div class="n">06</div><div><div class="t">Conclusiones y cierre</div><div class="d">Anexo de conceptos, preguntas y certificado</div></div><div class="time">39:00–45:00</div></div>
     </div>
-    <footer class="pagefoot"><span>Webinar · Agentes de IA con AWS</span><span>1 / 23</span></footer>
+    <footer class="pagefoot"><span>Webinar · Agentes de IA en la Nube</span><span>1 / 23</span></footer>
   </section>
 
   <!-- 2: 01 INTRODUCCIÓN -->
@@ -544,15 +544,15 @@
     <h2 class="section-title">AWS: las herramientas detrás del despliegue</h2>
     <div class="content">
       <div class="grid3">
-        <div class="card"><h3>🌐 CloudFront</h3><p>Usado en este proyecto. CDN que sirve como entrada pública HTTPS. Free tier permanente.</p></div>
-        <div class="card"><h3>📦 ECR</h3><p>Registro privado de imágenes Docker. Ruta completa (no usada aquí).</p></div>
+        <div class="card"><h3>🌐 CloudFront</h3><p>CDN que sirve como entrada pública HTTPS hacia cualquier origen. Free tier permanente.</p></div>
+        <div class="card"><h3>📦 ECR</h3><p>Registro privado de imágenes Docker, para la ruta 100% AWS.</p></div>
         <div class="card"><h3>🚀 ECS Fargate</h3><p>Corre contenedores sin administrar servidores. Cobra por cómputo reservado.</p></div>
         <div class="card"><h3>⚖️ ALB</h3><p>Balanceador de carga con DNS público estable. Costo fijo aunque no haya tráfico.</p></div>
         <div class="card"><h3>🔐 Secrets Manager</h3><p>Guarda credenciales sin exponerlas en el código ni en variables planas.</p></div>
         <div class="card"><h3>📈 CloudWatch</h3><p>Recibe logs automáticamente y permite alarmas sobre el healthcheck.</p></div>
       </div>
-      <p class="subtitle" style="margin-top:6px;">Este proyecto solo necesitó CloudFront (gratis). El resto se documenta como
-      la ruta 100% AWS para cargas de tráfico reales.</p>
+      <p class="subtitle" style="margin-top:6px;">CloudFront por sí solo alcanza para una URL pública gratis apuntando a
+      cualquier backend; el resto de piezas conforman la ruta 100% AWS, pensada para tráfico real sostenido.</p>
     </div>
     <footer class="pagefoot"><span>Anexo · AWS</span><span>19 / 23</span></footer>
   </section>
@@ -560,21 +560,20 @@
   <!-- 16e: ANEXO - GCP -->
   <section class="slide">
     <div class="kicker"><span class="num">ⓘ</span> Anexo</div>
-    <h2 class="section-title">GCP: la alternativa evaluada (Cloud Run)</h2>
+    <h2 class="section-title">GCP: la opción con Cloud Run</h2>
     <div class="content">
       <p class="subtitle">Cloud Run es el servicio "serverless" de contenedores de Google Cloud:
       recibe una imagen Docker, la ejecuta bajo demanda y <b style="color:#fff">escala a cero</b>
       cuando nadie la usa — no se paga nada sin tráfico.</p>
       <div class="card">
-        <h3>⚖️ Por qué se evaluó</h3>
-        <p>Su capa gratuita (2M solicitudes + 180.000 vCPU-s al mes, para siempre) la hacía una
-        candidata directa frente a la ruta 100% AWS de pago.</p>
+        <h3>⚖️ Cuándo elegirla</h3>
+        <p>Su capa gratuita (2M solicitudes + 180.000 vCPU-s al mes, para siempre) la hace una
+        alternativa directa a la ruta 100% AWS, dentro del ecosistema de Google.</p>
       </div>
       <div class="card">
-        <h3>⚠️ Con qué se tropezó</h3>
-        <p>Habilitar el servicio exigió una cuenta de facturación activa — la disponible
-        estaba cerrada y reactivarla pedía un cargo de verificación de tarjeta. Se prefirió
-        no proceder por esa vía para esta demo puntual.</p>
+        <h3>⚠️ Requisito a tener en cuenta</h3>
+        <p>Habilitar el servicio exige una cuenta de facturación activa vinculada al proyecto,
+        aunque el uso se mantenga dentro de la capa gratuita.</p>
       </div>
       <div class="badge">📄 Detalle completo y comandos: Manual de despliegue (ver siguiente slide)</div>
     </div>
@@ -589,12 +588,12 @@
       <table class="logtable">
         <tr><td>GitHub</td><td>Gratis — repos públicos/privados ilimitados</td></tr>
         <tr><td>Docker</td><td>Gratis — motor de código abierto</td></tr>
-        <tr><td>Render (backend usado)</td><td>Gratis — 750h/mes, sin tarjeta, se duerme tras 15 min</td></tr>
-        <tr><td>AWS CloudFront (usado)</td><td>Gratis permanente — 1TB + 10M solicitudes/mes</td></tr>
+        <tr><td>Render (opción gratuita)</td><td>Gratis — 750h/mes, sin tarjeta, se duerme tras 15 min</td></tr>
+        <tr><td>AWS CloudFront</td><td>Gratis permanente — 1TB + 10M solicitudes/mes</td></tr>
         <tr><td>AWS ECS Fargate + ALB</td><td>De pago — ~USD 25-35/mes</td></tr>
-        <tr><td>GCP Cloud Run (evaluado)</td><td>Gratis permanente, requiere tarjeta verificada</td></tr>
+        <tr><td>GCP Cloud Run</td><td>Gratis permanente, requiere tarjeta verificada</td></tr>
       </table>
-      <div class="badge">✅ Arquitectura final de este proyecto: USD 0/mes</div>
+      <div class="badge">✅ Es posible tener una demo pública funcionando por USD 0/mes</div>
     </div>
     <footer class="pagefoot"><span>Anexo · Costos</span><span>21 / 23</span></footer>
   </section>
@@ -607,8 +606,8 @@
       <div class="card">
         <h3>📘 AWS + GCP + Docker + GitHub, paso a paso</h3>
         <p>Incluye cómo crear las cuentas de AWS y GCP, qué créditos dan a cuentas nuevas,
-        los comandos reales usados en este proyecto, y los obstáculos encontrados (y cómo se
-        resolvieron).</p>
+        los comandos reales para cada opción (AWS, GCP y la ruta gratuita con GitHub + Render),
+        y las consideraciones de costo para elegir entre ellas.</p>
       </div>
       <div class="pillrow">
         <span class="pill">📄 MANUAL_DESPLIEGUE_AWS_GCP.pdf (adjunto)</span>
@@ -625,7 +624,7 @@
       <p class="subtitle" style="margin:0 auto;">Preguntas y respuestas</p>
       <div class="by" style="margin-top:44px;">Presentado por<b>Luis David Chuquín Itas</b></div>
     </div>
-    <footer class="pagefoot"><span>Webinar · Agentes de IA con AWS</span><span>23 / 23</span></footer>
+    <footer class="pagefoot"><span>Webinar · Agentes de IA en la Nube</span><span>23 / 23</span></footer>
   </section>
 
   <div class="controls">
