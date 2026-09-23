@@ -12,49 +12,63 @@ la propuesta del webinar (Figura 1: Cliente → API REST → Orquestador → LLM
 > `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION`) con permisos
 > sobre ECR, ECS, IAM, S3, CloudFront, Secrets Manager y CloudWatch.
 
-## Estado actual (2026-09-23) y bloqueos de cuenta pendientes
+## Estado actual (2026-09-23): desplegado y probado, arquitectura final
 
-Al intentar ejecutar este plan se encontraron dos bloqueos **a nivel de cuenta**,
-no de permisos ni de código, que quedan pendientes de resolución por parte
-del autor (no se pueden resolver por CLI):
+Tras encontrar bloqueos de verificación de cuenta en ambos AWS y GCP
+(historial abajo), la arquitectura que quedó **desplegada, probada de punta
+a punta y en uso real** es:
 
-- **AWS (cuenta 490756899531)**: `aws cloudfront create-distribution` devuelve
-  `AccessDenied: Your account must be verified before you can add new
-  CloudFront resources`. Se resuelve abriendo un caso en
-  `https://support.console.aws.amazon.com/support/home#/case/create`
-  ("Account and billing support" → tipo "Account"), solo posible logueado
-  como root. Estado: pendiente de confirmar si el caso ya se envió.
-- **GCP (cuenta personal `david2510chuquin@gmail.com`, proyecto
-  `agente-cotizador-webinar` ya creado)**: `gcloud services enable
-  run.googleapis.com` falla con `Billing account ... is not found` — la única
-  cuenta de facturación de esa cuenta (`Mi cuenta de facturación`,
-  `01CB99-1121DC-4290BD`) está cerrada (`OPEN: False`). Se resuelve
-  reactivándola o creando una nueva en `https://console.cloud.google.com/billing`.
-
-**Plan B mientras tanto (activo y probado)**: backend corriendo en local
-(`uvicorn app.main:app --port 8080`) expuesto vía **Cloudflare Tunnel**
-(`cloudflared tunnel --url http://localhost:8080`, sin cuenta, gratis). Da una
-URL pública HTTPS tipo `https://<palabras-random>.trycloudflare.com`.
-
-⚠️ **Es frágil**: la URL cambia cada vez que se reinicia el túnel, y la
-conexión se cae si cambia la red, se suspende el equipo, o pasa mucho tiempo
-(ya ocurrió una vez en pruebas — Cloudflare mismo advierte "no uptime
-guarantee" para túneles sin cuenta). **No dejarlo corriendo días antes del
-webinar** — repetir estos pasos justo antes de la demo:
-
-```bash
-# 1. Backend
-uvicorn app.main:app --port 8080 &
-
-# 2. Túnel (imprime la URL pública nueva cada vez)
-cloudflared.exe tunnel --url http://localhost:8080
-
-# 3. Probar antes de salir en vivo
-curl https://<la-url-que-imprimió>.trycloudflare.com/health
+```
+Cliente → CloudFront (AWS, gratis) → Render.com free tier (backend FastAPI/LangGraph)
 ```
 
-Si el túnel se cae a media demo, el plan de contingencia normal aplica
-igual: modo offline + video de respaldo (ver `docs/GUION_WEBINAR.md`).
+- **Backend**: Render.com, plan free, desplegado desde
+  `https://github.com/mathsci-2510/agente-cotizador-webinar` (build automático
+  desde el `Dockerfile` vía `render.yaml`). URL directa:
+  `https://agente-cotizador-webinar.onrender.com`.
+- **CDN/entrada pública en AWS**: distribución de CloudFront
+  `E3DFO5Y77NOIIO`, dominio `https://d2huls6tugzwwb.cloudfront.net`, origen
+  custom apuntando al backend de Render. **Importante**: usa la política de
+  origin request **`Managed-AllViewerExceptHostHeader`**
+  (`b689b0a8-53d0-40ab-baf2-68738e2966ac`), no `AllViewer` — con `AllViewer`
+  CloudFront reenvía el header `Host` del visitante (el dominio de
+  CloudFront) en vez del de Render, y Render (multi-tenant) responde 502
+  porque no reconoce ese host. Cache policy: `CachingDisabled` (API dinámica).
+- **Costo real**: ambos servicios están dentro de su free tier permanente
+  (CloudFront: 1TB/10M requests al mes, siempre gratis; Render free web
+  service: 750h/mes, sin tarjeta). Costo esperado: **USD 0**.
+- **Limitación conocida de Render free**: el servicio "duerme" tras ~15 min
+  sin tráfico y tarda hasta ~1 min en responder la primera petición tras
+  despertar (ya observado en pruebas: un `curl` con timeout corto dio
+  timeout, con más tiempo respondió 200 normalmente). Antes del webinar,
+  hacer un `GET /health` unos minutos antes de salir en vivo para
+  "despertarlo".
+- **Variables de entorno pendientes de cargar en el dashboard de Render**
+  (quedaron como `sync: false` en `render.yaml` a propósito, para no
+  comprometerlas en git): `OPENAI_API_KEY` (opcional, si se quiere modo LLM
+  en vivo) y `REDIS_URL` (para que el checkpointer use Redis Cloud en vez de
+  SQLite efímero del contenedor). Mientras no se carguen, el agente corre en
+  modo offline con SQLite — que es exactamente el plan de contingencia, así
+  que es una configuración válida para el webinar tal cual está.
+
+### Historial de bloqueos encontrados (ya resueltos o descartados)
+
+- **AWS (cuenta 490756899531)**: al principio `aws cloudfront
+  create-distribution` devolvía `AccessDenied: Your account must be verified
+  before you can add new CloudFront resources`. Se resolvió después de que
+  el autor gestionara la verificación de la cuenta — un reintento posterior
+  del mismo comando ya funcionó y creó la distribución sin cambios de
+  permisos de por medio.
+- **GCP (Cloud Run)**: descartado como opción — la cuenta personal
+  (`david2510chuquin@gmail.com`, proyecto `agente-cotizador-webinar`, ya
+  creado por si se retoma) no tenía cuenta de facturación activa, y
+  reactivarla implicaba un cargo de verificación de tarjeta que el autor
+  prefirió evitar. Se optó por Render en su lugar (sin tarjeta).
+- **ECS Fargate + ALB** (plan original de las secciones 1-3 de abajo): no
+  se llegó a necesitar — Render + CloudFront resultó suficiente y gratis
+  para el alcance de un webinar de 45 minutos. Las secciones siguientes se
+  dejan como referencia si en el futuro se requiere una arquitectura 100%
+  AWS (más control, pero con costo real de ALB/Fargate, ver sección 3).
 
 ## 0. Prerrequisitos
 
@@ -171,10 +185,19 @@ origen, ya que ahora frontend y backend están en dominios distintos.
 
 ## 7. Checklist antes del webinar
 
-- [ ] Imagen construida y publicada en ECR.
-- [ ] Servicio ECS corriendo y accesible vía el DNS del ALB.
-- [ ] `GET /health` responde `{"status":"ok"}` desde la URL pública.
-- [ ] Prueba end-to-end de una cotización completa contra la URL pública
-      (no solo en `localhost`).
+Arquitectura real en uso (Render + CloudFront, ver sección de Estado actual):
+
+- [x] Backend construido y desplegado en Render (`agente-cotizador-webinar.onrender.com`).
+- [x] Distribución de CloudFront creada y en `Deployed`
+      (`d2huls6tugzwwb.cloudfront.net`, id `E3DFO5Y77NOIIO`).
+- [x] `GET /health` responde `{"status":"ok"}` desde la URL pública de CloudFront.
+- [x] Prueba end-to-end de una cotización completa (equipo → cantidad →
+      ciudad → nombre → contacto → PDF) contra la URL pública de CloudFront,
+      no solo en `localhost`.
+- [ ] Cargar `OPENAI_API_KEY` y/o `REDIS_URL` en el dashboard de Render si se
+      quiere modo LLM y/o checkpointer compartido (opcional — el modo offline
+      con SQLite ya funciona y es el plan de contingencia).
+- [ ] Hacer un `GET /health` unos minutos antes de salir en vivo, para
+      "despertar" a Render si estuvo dormido por inactividad.
 - [ ] Video de respaldo grabado de la demo funcionando (plan de
       contingencia, ver `docs/GUION_WEBINAR.md`).

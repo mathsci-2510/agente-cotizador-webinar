@@ -59,8 +59,15 @@ dato a la vez, sin depender de ningún servicio externo. Esto garantiza que
 la demo del webinar funcione incluso sin conexión a OpenAI — ver
 `docs/GUION_WEBINAR.md`, sección "Plan de contingencia".
 
-## Siguiente paso: despliegue en AWS
+## Demo en vivo
 
-Este repositorio ya corre localmente. Para llevarlo a producción en AWS,
-ver `infra/DEPLOY_AWS.md` y `CLAUDE.md` — la idea es abrir este mismo
-repositorio con Claude Code y pedirle que continúe con el despliegue.
+Desplegado y probado de punta a punta: **https://d2huls6tugzwwb.cloudfront.net**
+(CloudFront de AWS, gratis, apuntando a un backend en Render.com, también
+gratis). Detalle de la arquitectura y por qué se llegó a esta combinación en
+`infra/DEPLOY_AWS.md`.
+
+## Siguiente paso
+
+El despliegue base ya está en producción (ver arriba). Lo que queda es
+opcional: cargar `OPENAI_API_KEY`/`REDIS_URL` en Render para modo LLM y
+checkpointer compartido — ver `infra/DEPLOY_AWS.md` y `CLAUDE.md`.
