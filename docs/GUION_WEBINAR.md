@@ -1,86 +1,81 @@
-# Guion del Webinar y Ficha Logística
+# Guion del webinar
 
-Documento de trabajo (no académico) que complementa la propuesta de tema
-entregada a Cenestur, respondiendo puntualmente a las observaciones de
-Angelica: público objetivo, objetivos de aprendizaje, guion con tiempos,
-ficha logística y plan de contingencia.
+Notas de trabajo para la sesión: ficha logística, a quién le hablo, qué quiero
+que se lleven, y el minuto a minuto que voy a seguir en vivo. No es un
+documento formal — si algo suena raro leyéndolo en voz alta, lo cambio antes
+del día del webinar.
 
-## 1. Ficha logística
+## Ficha logística
 
 | Campo | Valor |
 |---|---|
 | Plataforma | Google Meet |
-| Modalidad | Virtual, sincrónica |
-| Duración total | 45 minutos |
-| Fecha y hora | **[POR DEFINIR]** — a coordinar con Cenestur antes de fijar la pre-defensa |
-| Registro de asistentes | Formulario de registro previo (enlace **[POR DEFINIR]**), con correo institucional |
-| Certificado | Certificado de asistencia emitido por Cenestur a quienes completen el registro de asistencia durante la sesión |
-| Grabación | Se grabará la sesión como respaldo y como evidencia para el informe final |
+| Modalidad | Virtual, en vivo |
+| Duración | 45 minutos |
+| Fecha y hora | **[POR DEFINIR]** — coordinar con Cenestur antes de fijar la pre-defensa |
+| Registro | Formulario previo (enlace por definir), correo institucional |
+| Certificado | Lo emite Cenestur a quien registre asistencia durante la sesión |
+| Grabación | Sí, como respaldo y como evidencia para el informe final |
 
-## 2. Público objetivo y conocimientos previos asumidos
+## A quién le hablo
 
-**Público objetivo:** estudiantes y profesionales del área de TI (con
-énfasis en estudiantes de la carrera de Tecnología Superior en Big Data e
-Inteligencia de Negocio) interesados en la aplicación práctica de
-inteligencia artificial generativa.
+La mayoría de los que se van a conectar son compañeros de Big Data e
+Inteligencia de Negocio, algunos ya trabajando y otros todavía en clases.
+Nadie llega necesariamente sabiendo qué es LangGraph o cómo funciona AWS, así
+que explico todo desde el concepto — nada de configuración fina en pantalla
+durante la parte expositiva, eso queda para la demo.
 
-**Conocimientos previos asumidos:** nociones básicas de programación y de
-consumo de servicios web (qué es una API), sin requerir experiencia previa
-en inteligencia artificial, LangGraph, ni en AWS. La sesión está diseñada
-para introducir estos conceptos desde cero, a nivel conceptual.
+## Qué quiero que se lleven
 
-## 3. Objetivos de aprendizaje para los asistentes
+Esto es distinto de mi objetivo como autor del trabajo (que es diseñar,
+construir y desplegar el agente). Lo que busco es que, al cerrar la sesión,
+cualquiera que estuvo ahí pueda:
 
-*(Distintos de los objetivos del proyecto, que describen lo que el autor
-desarrolla; estos describen lo que el asistente se lleva de la sesión.)*
+1. Explicar con sus palabras qué es un agente de IA y por qué no es lo mismo
+   que hacerle una pregunta a un modelo.
+2. Reconocer las piezas típicas de una arquitectura de agente en producción
+   — API, orquestador, modelo, persistencia, nube — sin necesitar dominar
+   cada una.
+3. Entender, con el caso del cotizador, cómo todo esto se traduce en un
+   proceso de negocio real y por qué a las empresas les importa llegar a
+   producción, no solo tener un buen prototipo.
 
-Al finalizar el webinar, el asistente será capaz de:
+## Cómo pienso llevar la sesión
 
-1. Explicar, en términos generales, qué es un agente de inteligencia
-   artificial y qué diferencia a un agente de una simple consulta a un
-   modelo de lenguaje.
-2. Identificar las piezas típicas de una arquitectura de agente en
-   producción (API, orquestador, modelo, persistencia, infraestructura de
-   nube) sin necesidad de dominar cada tecnología en detalle.
-3. Reconocer, a través del caso del agente cotizador de equipos médicos,
-   cómo estos conceptos se traducen en un proceso de negocio automatizado
-   real.
+Bloques cortos hablando, intercalados con la demo en vivo y con preguntas a
+la audiencia repartidas a lo largo de toda la hora — no solo dejo el espacio
+de preguntas para el final. La metodología XP que menciono en el desarrollo
+es la que usé para construir el agente, no el diseño pedagógico de esta
+sesión; conviene aclararlo explícitamente en vivo porque se presta a
+confusión.
 
-## 4. Enfoque pedagógico
+## Minuto a minuto
 
-Sesión expositivo-demostrativa: bloques cortos de exposición conceptual
-(sin profundizar en código ni en configuración fina de AWS), intercalados
-con una demostración en vivo y momentos explícitos de interacción con la
-audiencia (no solo al final). La metodología XP mencionada en el informe
-corresponde al **desarrollo del agente** (cómo se construyó el software),
-no al diseño instruccional de esta sesión.
+| Tiempo | Bloque | Qué digo / muestro |
+|---|---|---|
+| 00:00–03:00 | Bienvenida | Quién soy, agenda, encuesta rápida ("¿ya usaste un chatbot de IA?") |
+| 03:00–06:00 | Introducción | De prototipo a producción — la brecha que nadie enseña junto con el modelo |
+| 06:00–13:00 | Justificación y mercado | Por qué este tema ahora, tamaño del mercado, el dato de Gartner sobre proyectos cancelados, y el caso real de DigitalES que se parece al mío |
+| 13:00–17:00 | Problemática | Las cuatro razones por las que un agente se queda en el prototipo |
+| 17:00–19:00 | Objetivo | Qué se llevan (distinto de mi objetivo de tesis) |
+| 19:00–39:00 | Desarrollo | Qué es un agente, orquestación, arquitectura, el caso del cotizador, cómo lo construí (XP), y las tres rutas de despliegue — AWS, GCP, y la gratuita con GitHub y Render — seguido de la demo en vivo |
+| 39:00–45:00 | Cierre | Conclusiones, ficha logística, preguntas y cómo obtener el certificado |
 
-## 5. Guion con tiempos (duración total: 45 minutos)
+Preguntas dirigidas planeadas: una tras la encuesta inicial, una durante la
+problemática ("¿cuál de estas capas creen que falla más seguido?"), y una
+invitación abierta en la demo para que alguien proponga qué equipo cotizar.
 
-| Tiempo | Bloque | Contenido | Interacción |
-|---|---|---|---|
-| 00:00–03:00 | Bienvenida | Presentación del expositor, agenda, objetivos de aprendizaje | Encuesta rápida: "¿Ya usaste un chatbot de IA?" (chat/reacciones) |
-| 03:00–08:00 | Introducción y justificación | Contexto: de prototipos de IA a soluciones en producción | — |
-| 08:00–12:00 | Problemática y objetivo | Por qué muchos agentes no llegan a producción; objetivo del proyecto | Pregunta dirigida a 1-2 asistentes |
-| 12:00–22:00 | Marco conceptual (nivel conceptual, no profundizar en código) | Qué es un agente de IA, orquestación por grafo de estados, capas de la arquitectura (Figura 1), rol de cada servicio de AWS a alto nivel | Pregunta: "¿cuál de estas capas creen que falla más seguido?" |
-| 22:00–34:00 | Demostración en vivo | Conversación real con el agente cotizador ya desplegado, generación de la cotización en PDF | Se invita a un asistente a sugerir el equipo a cotizar |
-| 34:00–39:00 | Conclusiones | Aprendizajes clave, cierre del ciclo diseño→producción | Pregunta de cierre a la audiencia |
-| 39:00–45:00 | Preguntas y respuestas + cierre | Q&A abierto, indicaciones para el certificado de asistencia | Q&A |
+## Si algo falla
 
-## 6. Plan de contingencia para la demo en vivo
+El respaldo real está en el propio agente: si no hay conexión con el modelo
+de lenguaje, cae solo a un guion de reglas que no depende de internet
+(`app/extraction.py`). Aun así, dejo esto preparado por si algo más se cae:
 
-- **Modo offline integrado**: el agente (`app/extraction.py`) detecta la
-  ausencia de `OPENAI_API_KEY` (o cualquier falla de red hacia OpenAI) y
-  cae automáticamente a un guion determinístico que no depende de
-  internet ni de servicios externos. La demo nunca se cae por falta de
-  conectividad al LLM.
-- **Video de respaldo**: grabar previamente una corrida completa de la
-  demo (ideal: la misma grabación de un ensayo general) y tenerla lista
-  para reproducir si falla la conexión a Google Meet, el despliegue en
-  AWS, o cualquier variable fuera de control el día del evento.
-- **Datos de prueba ya validados**: usar en el ensayo general el mismo
-  guion de conversación probado (equipo → cantidad → ciudad → nombre →
-  contacto) para asegurar que la cotización se genera sin errores antes
-  del evento.
-- **Conectividad de respaldo**: tener disponible un punto de acceso móvil
-  (hotspot) como alternativa a la red principal.
+- **Video grabado** de un ensayo completo de la demo, listo para reproducir
+  si falla Meet, el despliegue, o cualquier cosa fuera de mi control.
+- **Guion de conversación ya probado** (equipo → cantidad → ciudad → nombre
+  → contacto) para no improvisar en vivo.
+- **Hotspot del celular** como respaldo de conexión.
+- El backend gratuito (Render) se "duerme" si nadie lo usa por un rato — le
+  mando un `GET /health` unos minutos antes de conectarme para que esté
+  despierto cuando empiece.
