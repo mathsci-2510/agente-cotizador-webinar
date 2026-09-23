@@ -39,6 +39,7 @@ class Settings:
     checkpoint_db_path: str
     quotes_dir: str
     company_display_name: str
+    redis_url: str
 
 
 settings = Settings(
@@ -49,6 +50,7 @@ settings = Settings(
     checkpoint_db_path=_clean("CHECKPOINT_DB_PATH", str(BASE_DIR / "data" / "checkpoints.sqlite")),
     quotes_dir=_clean("QUOTES_DIR", str(BASE_DIR / "data" / "quotes")),
     company_display_name=_clean("COMPANY_DISPLAY_NAME", "Demo Webinar - Agentes de IA con AWS"),
+    redis_url=_clean("REDIS_URL", ""),
 )
 
 OFFLINE_MODE = not bool(settings.openai_api_key)

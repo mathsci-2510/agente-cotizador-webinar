@@ -14,9 +14,10 @@ está listo para contenerizarse y desplegarse en AWS.
 ```
 app/            Agente (grafo LangGraph), API FastAPI, catálogo, generación de PDF
 demo/           Interfaz web de chat (estática) que consume la API
+presentation/   Presentación HTML del webinar (deck de slides, navegable con flechas)
 infra/          Dockerfile y guía de despliegue en AWS
 docs/           Guion del webinar, ficha logística y plan de contingencia
-data/           Estado de conversación (sqlite) y cotizaciones generadas (se crea en runtime)
+data/           Estado de conversación (sqlite si no hay Redis) y cotizaciones generadas (se crea en runtime)
 CLAUDE.md       Contexto para continuar el trabajo con Claude Code (despliegue en AWS)
 ```
 
@@ -41,6 +42,14 @@ curl -X POST http://localhost:8080/chat ^
   -H "Content-Type: application/json" ^
   -d "{\"session_id\":\"demo1\",\"mensaje\":\"Necesito cotizar un ecografo\"}"
 ```
+
+## Persistencia de conversación: SQLite o Redis
+
+Por defecto usa un checkpointer SQLite local (`data/checkpoints.sqlite`),
+suficiente para una sola instancia. Si defines `REDIS_URL` en `.env`
+(formato `redis://usuario:password@host:puerto`), el agente usa Redis en su
+lugar, lo que permite correr varias réplicas del contenedor sin perder el
+estado de la conversación. Nunca subas esa URL con contraseña a git.
 
 ## Modo offline (respaldo de contingencia)
 

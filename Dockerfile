@@ -15,4 +15,5 @@ COPY . .
 RUN mkdir -p /app/data/quotes
 
 EXPOSE 8080
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# $PORT lo inyectan plataformas como Render; en local/ECS cae a 8080.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

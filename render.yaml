@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: agente-cotizador-webinar
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_TEMPERATURE
+        value: "0.2"
+      - key: APP_NAME
+        value: Agente Cotizador de Equipos Médicos
+      - key: COMPANY_DISPLAY_NAME
+        value: Demo Webinar - Agentes de IA con AWS
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
