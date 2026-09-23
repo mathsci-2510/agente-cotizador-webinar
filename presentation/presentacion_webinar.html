@@ -112,11 +112,12 @@
     transition:width .25s ease;z-index:7;}
 
   @media print{
-    body{background:#0a0f1e;}
-    .controls{display:none;}
+    @page{size:13.333in 7.5in;margin:0;}
+    html,body{background:#0a0f1e;width:13.333in;height:7.5in;}
+    .controls,.progress{display:none;}
     .slide{display:flex !important;position:relative;page-break-after:always;
-      height:100vh;width:100vw;}
-    .deck{height:auto;}
+      height:7.5in;width:13.333in;padding:0.7in 0.9in;}
+    .deck{height:auto;width:auto;}
   }
 </style>
 </head>
