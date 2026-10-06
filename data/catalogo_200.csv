@@ -1,0 +1,201 @@
+codigo,nombre,categoria,precio_usd,tiempo_entrega_dias
+ECO-100,Ecógrafo portátil doppler color,Diagnóstico por imagen,39500,30
+IMG-101,Ecógrafo de carro gama alta,Diagnóstico por imagen,85000,40
+RX-600,Equipo de rayos X portátil,Diagnóstico por imagen,60000,35
+IMG-102,Equipo de rayos X fijo de techo,Diagnóstico por imagen,95000,45
+IMG-103,Arco en C para fluoroscopía,Diagnóstico por imagen,110000,45
+IMG-104,Tomógrafo computarizado compacto,Diagnóstico por imagen,450000,90
+IMG-105,Resonancia magnética abierta,Diagnóstico por imagen,950000,120
+IMG-106,Mamógrafo digital,Diagnóstico por imagen,130000,50
+IMG-107,Densitómetro óseo,Diagnóstico por imagen,42000,35
+IMG-108,Angiógrafo digital,Diagnóstico por imagen,380000,90
+IMG-109,Sistema de radiografía digital DR,Diagnóstico por imagen,72000,40
+IMG-110,Revelador de placas CR,Diagnóstico por imagen,18000,25
+IMG-111,Ecógrafo veterinario portátil,Diagnóstico por imagen,18500,25
+IMG-112,Equipo de ultrasonido Doppler vascular,Diagnóstico por imagen,28000,30
+IMG-113,Gammacámara portátil,Diagnóstico por imagen,210000,60
+MON-200,Monitor de signos vitales multiparámetro,Monitoreo,3800,15
+MON-201,Monitor de presión arterial no invasiva,Monitoreo,950,10
+MON-202,Monitor fetal cardiotocógrafo,Monitoreo,4200,20
+MON-203,Oxímetro de pulso de mesa,Monitoreo,650,10
+MON-204,Oxímetro de pulso portátil,Monitoreo,180,7
+MON-205,Monitor de capnografía,Monitoreo,5200,20
+MON-206,Monitor de presión intracraneal,Monitoreo,8500,25
+MON-207,Holter de presión arterial 24h,Monitoreo,1200,15
+MON-208,Holter de ECG 24h,Monitoreo,2800,15
+MON-209,Monitor de glucosa continua,Monitoreo,650,10
+MON-210,Central de monitoreo multiparamétrico,Monitoreo,15000,30
+MON-211,Monitor de anestesia,Monitoreo,9800,25
+MON-212,Monitor neonatal,Monitoreo,4600,20
+MON-213,Monitor de temperatura central,Monitoreo,1300,12
+MON-214,Pulsioxímetro veterinario,Monitoreo,420,10
+DESA-300,Desfibrilador bifásico con marcapasos externo,Emergencia,2500,20
+EME-301,Desfibrilador externo automático (DEA),Emergencia,1450,15
+EME-302,Carro de paro completo,Emergencia,3200,20
+EME-303,Aspirador de secreciones portátil,Emergencia,480,10
+EME-304,Bolsa válvula máscara reutilizable,Emergencia,65,7
+EME-305,Tabla espinal larga,Emergencia,180,7
+EME-306,Collarín cervical ajustable,Emergencia,45,5
+EME-307,Camilla rígida de rescate,Emergencia,320,10
+EME-308,Férulas de inmovilización neumáticas (juego),Emergencia,150,10
+EME-309,Laringoscopio de fibra óptica,Emergencia,1100,15
+EME-310,Succionador quirúrgico de pared,Emergencia,890,15
+EME-311,Maletín de emergencias equipado,Emergencia,620,10
+EME-312,Mascarilla de oxígeno con reservorio (caja),Emergencia,120,7
+EME-313,Tanque de oxígeno portátil con regulador,Emergencia,380,10
+EME-314,Chaleco de compresión torácica automatizada,Emergencia,14500,30
+CAM-400,Camilla de exploración eléctrica,Mobiliario clínico,1350,10
+MOB-401,Camilla de exploración manual,Mobiliario clínico,650,10
+MOB-402,Silla de ruedas estándar,Mobiliario clínico,220,7
+MOB-403,Silla de ruedas eléctrica,Mobiliario clínico,2800,15
+MOB-404,Cama hospitalaria eléctrica multiposición,Mobiliario clínico,3200,20
+MOB-405,Cama hospitalaria manual,Mobiliario clínico,1450,15
+MOB-406,Grúa de transferencia de pacientes,Mobiliario clínico,2600,20
+MOB-407,Mesa de mayo quirúrgica,Mobiliario clínico,480,10
+MOB-408,Taburete clínico giratorio,Mobiliario clínico,95,7
+MOB-409,Biombo divisor móvil,Mobiliario clínico,180,7
+MOB-410,Carro de curaciones,Mobiliario clínico,420,10
+MOB-411,Carro de medicamentos con cerradura,Mobiliario clínico,950,12
+MOB-412,Mueble de almacenamiento clínico,Mobiliario clínico,680,12
+MOB-413,Lámpara de exploración LED con brazo,Mobiliario clínico,340,10
+MOB-414,Soporte de suero rodante,Mobiliario clínico,45,5
+VENT-500,Ventilador mecánico de transporte,Cuidados críticos,5000,25
+CRI-501,Ventilador mecánico de UCI,Cuidados críticos,28000,35
+CRI-502,Concentrador de oxígeno estacionario,Cuidados críticos,850,15
+CRI-503,Concentrador de oxígeno portátil,Cuidados críticos,2400,15
+CRI-504,Bomba de infusión volumétrica,Cuidados críticos,1350,15
+CRI-505,Bomba de infusión de jeringa,Cuidados críticos,980,15
+CRI-506,Incubadora neonatal de transporte,Cuidados críticos,18500,35
+CRI-507,Incubadora neonatal estacionaria,Cuidados críticos,22000,35
+CRI-508,Cuna de calor radiante neonatal,Cuidados críticos,9800,30
+CRI-509,Nebulizador clínico de mesa,Cuidados críticos,180,7
+CRI-510,Humidificador de alto flujo,Cuidados críticos,3600,20
+CRI-511,CPAP para uso hospitalario,Cuidados críticos,2200,15
+CRI-512,BiPAP domiciliario,Cuidados críticos,2800,15
+CRI-513,Sistema de terapia de presión negativa,Cuidados críticos,4200,20
+CRI-514,Bomba de nutrición enteral,Cuidados críticos,750,12
+LAB-601,Analizador de química sanguínea automatizado,Laboratorio,32000,35
+LAB-602,Analizador hematológico automatizado,Laboratorio,28000,35
+LAB-603,Centrífuga de laboratorio clínico,Laboratorio,1200,15
+LAB-604,Microscopio binocular clínico,Laboratorio,650,15
+LAB-605,Microscopio de contraste de fases,Laboratorio,2400,20
+LAB-606,Baño maría de laboratorio,Laboratorio,380,10
+LAB-607,Autoclave de mesa para laboratorio,Laboratorio,1450,15
+LAB-608,Refrigerador para banco de sangre,Laboratorio,3200,20
+LAB-609,Congelador ultrabajo -80°C,Laboratorio,12500,30
+LAB-610,Agitador vortex de laboratorio,Laboratorio,220,10
+LAB-611,Espectrofotómetro clínico,Laboratorio,4800,25
+LAB-612,Analizador de gases en sangre,Laboratorio,22000,30
+LAB-613,Analizador de orina automatizado,Laboratorio,8500,25
+LAB-614,Incubadora de cultivos de laboratorio,Laboratorio,1800,15
+LAB-615,Lector de microplacas ELISA,Laboratorio,9200,25
+EST-701,Autoclave de vapor para consultorio,Esterilización,2200,20
+EST-702,Autoclave de carga grande hospitalaria,Esterilización,18500,35
+EST-703,Esterilizador por calor seco,Esterilización,1600,15
+EST-704,Lavadora desinfectora de instrumental,Esterilización,9800,30
+EST-705,Sellador de bolsas de esterilización,Esterilización,450,10
+EST-706,Dispensador de alcohol gel automático,Esterilización,85,7
+EST-707,Cabina de bioseguridad clase II,Esterilización,6200,25
+EST-708,Carro de transporte de material estéril,Esterilización,520,10
+EST-709,Arco sanitizante de acceso,Esterilización,1800,15
+EST-710,Termo-selladora de empaques médicos,Esterilización,680,12
+QX-801,Mesa de quirófano eléctrica multiposición,Quirúrgico,18500,35
+QX-802,Lámpara quirúrgica LED de techo,Quirúrgico,7200,25
+QX-803,Electrobisturí monopolar/bipolar,Quirúrgico,3600,20
+QX-804,Torre de laparoscopía completa,Quirúrgico,42000,40
+QX-805,Bisturí armónico,Quirúrgico,16500,30
+QX-806,Sistema de succión-irrigación quirúrgica,Quirúrgico,2800,20
+QX-807,Monitor de profundidad anestésica,Quirúrgico,5400,20
+QX-808,Máquina de anestesia con ventilador integrado,Quirúrgico,32000,40
+QX-809,Ventilador de anestesia portátil,Quirúrgico,9800,25
+QX-810,Mesa auxiliar de instrumental quirúrgico,Quirúrgico,380,10
+QX-811,Columna de video endoscopía,Quirúrgico,28000,35
+QX-812,Insuflador de CO2 laparoscópico,Quirúrgico,6800,20
+QX-813,Bisturí eléctrico de alta frecuencia,Quirúrgico,4200,20
+QX-814,Torniquete neumático quirúrgico,Quirúrgico,1850,15
+QX-815,Taladro quirúrgico de alta velocidad,Quirúrgico,5600,20
+REH-901,Equipo de electroterapia multifuncional,Rehabilitación,1650,15
+REH-902,Equipo de ultrasonido terapéutico,Rehabilitación,980,15
+REH-903,Bicicleta de rehabilitación pasiva,Rehabilitación,1200,15
+REH-904,Barras paralelas de rehabilitación,Rehabilitación,850,12
+REH-905,Mesa de tracción cervical/lumbar,Rehabilitación,2400,20
+REH-906,Plataforma de estimulación vibratoria,Rehabilitación,2800,20
+REH-907,Equipo de magnetoterapia,Rehabilitación,3200,20
+REH-908,Equipo de láser terapéutico,Rehabilitación,4600,20
+REH-909,Banco de cuádriceps,Rehabilitación,520,10
+REH-910,Rueda de hombro para rehabilitación,Rehabilitación,180,7
+REH-911,Caminadora con sistema antigravedad,Rehabilitación,38000,40
+REH-912,Equipo de compresión neumática para linfedema,Rehabilitación,2200,15
+ODO-1001,Unidad dental completa,Odontología,12500,30
+ODO-1002,Autoclave dental de mesa,Odontología,1800,15
+ODO-1003,Compresor dental silencioso,Odontología,950,12
+ODO-1004,Lámpara de fotocurado dental,Odontología,320,10
+ODO-1005,Equipo de rayos X dental periapical,Odontología,4800,20
+ODO-1006,Escáner intraoral 3D,Odontología,16500,30
+ODO-1007,Pieza de mano de alta velocidad,Odontología,420,10
+ODO-1008,Micromotor dental con contrangulo,Odontología,680,12
+ODO-1009,Amalgamador dental,Odontología,280,10
+ODO-1010,Equipo de profilaxis ultrasónica,Odontología,850,12
+ODO-1011,Negatoscopio dental,Odontología,120,7
+ODO-1012,Sillón dental con taburete,Odontología,9800,25
+OFT-1101,Lámpara de hendidura oftálmica,Oftalmología,4200,20
+OFT-1102,Tonómetro de aplanación,Oftalmología,2800,15
+OFT-1103,Autorefractómetro computarizado,Oftalmología,8500,25
+OFT-1104,Oftalmoscopio indirecto,Oftalmología,1600,15
+OFT-1105,Campímetro computarizado,Oftalmología,9800,25
+OFT-1106,Biómetro óptico ocular,Oftalmología,18500,30
+OFT-1107,Unidad de refracción completa,Oftalmología,12000,30
+OFT-1108,Proyector de optotipos,Oftalmología,1800,15
+OFT-1109,Microscopio quirúrgico oftálmico,Oftalmología,65000,45
+OFT-1110,Láser YAG oftálmico,Oftalmología,42000,40
+PROT-1201,Cabina de aislamiento para pacientes,Protección y bioseguridad,8500,25
+PROT-1202,Bata quirúrgica reutilizable (paquete x10),Protección y bioseguridad,180,10
+PROT-1203,Traje de protección biológica nivel III (caja),Protección y bioseguridad,420,10
+PROT-1204,Mascarilla N95 de uso médico (caja x20),Protección y bioseguridad,65,7
+PROT-1205,Protector facial reutilizable (paquete x10),Protección y bioseguridad,85,7
+PROT-1206,Guantes de nitrilo (caja x100),Protección y bioseguridad,22,5
+PROT-1207,Kit de bioseguridad para transporte de muestras,Protección y bioseguridad,320,10
+PROT-1208,Dispositivo UV-C de desinfección ambiental,Protección y bioseguridad,2600,15
+MOV-1301,Andador ortopédico plegable,Movilidad y accesibilidad,95,7
+MOV-1302,Muletas de aluminio ajustables (par),Movilidad y accesibilidad,55,5
+MOV-1303,Bastón ortopédico ergonómico,Movilidad y accesibilidad,35,5
+MOV-1304,Elevador de pacientes hidráulico,Movilidad y accesibilidad,1800,15
+MOV-1305,Rampa portátil para silla de ruedas,Movilidad y accesibilidad,280,10
+MOV-1306,Cojín antiescaras de aire,Movilidad y accesibilidad,120,7
+MOV-1307,Colchón antiescaras de presión alterna,Movilidad y accesibilidad,480,10
+MOV-1308,Asiento elevador para inodoro,Movilidad y accesibilidad,75,7
+CARD-1401,Electrocardiógrafo de 12 canales,Cardiología,3200,15
+CARD-1402,Ergómetro para prueba de esfuerzo,Cardiología,9800,25
+CARD-1403,Sistema de ecocardiografía,Cardiología,65000,40
+CARD-1404,Marcapasos externo transcutáneo,Cardiología,4200,20
+CARD-1405,Holter de ECG de 12 derivaciones,Cardiología,3600,15
+CARD-1406,Desfibrilador implantable (DAI) de referencia,Cardiología,28000,45
+CARD-1407,Polígrafo de hemodinamia,Cardiología,85000,50
+CARD-1408,Catéter balón de angioplastia (caja x5),Cardiología,2400,20
+CARD-1409,Stent coronario liberador de fármaco (unidad),Cardiología,1850,20
+CARD-1410,Sistema de monitoreo remoto cardíaco,Cardiología,12500,30
+NEO-1501,Incubadora de transporte neonatal avanzada,Neonatología,24000,40
+NEO-1502,Fototerapia neonatal LED,Neonatología,2800,15
+NEO-1503,Calentador de sueros neonatal,Neonatología,650,10
+NEO-1504,Bomba de alimentación neonatal,Neonatología,980,12
+NEO-1505,Oxímetro neonatal de muñeca,Neonatología,420,10
+NEO-1506,Básculas pediátricas digitales,Neonatología,180,7
+NEO-1507,Set de reanimación neonatal,Neonatología,850,12
+NEO-1508,Monitor de bilirrubina transcutánea,Neonatología,3200,15
+DIA-1601,Máquina de hemodiálisis,Diálisis,22000,35
+DIA-1602,Sistema de ósmosis inversa para diálisis,Diálisis,18500,35
+DIA-1603,Sillón de diálisis reclinable,Diálisis,2400,15
+DIA-1604,Kit de diálisis peritoneal (caja),Diálisis,380,10
+DIA-1605,Monitor de acceso vascular para diálisis,Diálisis,4200,20
+DIA-1606,Balanza de precisión para diálisis,Diálisis,650,12
+DIA-1607,Calentador de dializado,Diálisis,1200,15
+TRANS-1701,Ambulancia equipada tipo II,Transporte de pacientes,85000,60
+TRANS-1702,Camilla de ambulancia con ruedas,Transporte de pacientes,2800,15
+TRANS-1703,Silla de ruedas de evacuación para escaleras,Transporte de pacientes,1650,15
+TRANS-1704,Incubadora de transporte terrestre,Transporte de pacientes,19500,35
+TRANS-1705,Vehículo de transporte sanitario básico,Transporte de pacientes,42000,50
+VET-1801,Analizador bioquímico veterinario,Diagnóstico veterinario,9800,30
+VET-1802,Mesa de cirugía veterinaria,Diagnóstico veterinario,2200,20
+VET-1803,Jaula de recuperación con oxígeno,Diagnóstico veterinario,1800,15
+VET-1804,Equipo de rayos X veterinario,Diagnóstico veterinario,32000,40
+VET-1805,Monitor multiparamétrico veterinario,Diagnóstico veterinario,3200,20
