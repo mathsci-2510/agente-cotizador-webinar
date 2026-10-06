@@ -9,19 +9,25 @@ hizo con el catálogo original de 6 — son órdenes de magnitud reales para
 sostener la demo del webinar, no un feed de precios en vivo ni datos de
 ningún proveedor específico.
 
-Resolución de "qué producto pidió el cliente" en tres capas, de más a menos
-estricta (ver `resolver_equipo`):
+Resolución de "qué producto pidió el cliente" (ver `resolver_equipo`):
   1. Substring exacto normalizado (sin tildes) sobre el nombre — instantáneo,
      no depende de red. Si matchea más de un producto (ambiguo, ej.
-     "monitor" calza en 15 nombres distintos) NO se adivina: se trata como
-     sin match confiable y esos productos pasan a ser candidatos sugeridos.
-  2. Fuzzy sobre el nombre con `difflib` (typos, no depende de red).
-  3. Búsqueda semántica por embeddings (sinónimos/paráfrasis), solo si hay
-     OPENAI_API_KEY — ver app/catalog_search.py.
-Si ninguna capa da un match confiable, se devuelven candidatos sugeridos en
-vez de inventar un producto o dejar pasar un nombre libre a la cotización
-(ese era exactamente el bug real: "estetoscopios" terminaba en el PDF con
-precio USD 0.00 porque no está en catálogo y nada lo bloqueaba).
+     "monitor" calza en 15 nombres distintos) NO se adivina: esos productos
+     pasan a ser candidatos sugeridos (son variantes reales del mismo tipo).
+  2. Si el cliente preguntó por un ÁREA CLÍNICA en vez de un producto puntual
+     (ej. "¿tienen equipos para ginecología?"), `buscar_por_especialidad`
+     devuelve los productos realmente usados ahí — no por parecido de texto.
+  3. Fuzzy por "ventana de palabras" (typos claros, cutoff alto) y búsqueda
+     semántica por embeddings (sinónimos, solo si hay OPENAI_API_KEY) — pero
+     SOLO para auto-completar con un único match de alta confianza, nunca
+     para rellenar la lista de candidatos sugeridos: los scores intermedios
+     de esas dos capas son justo lo que producía recomendaciones sin
+     relación real (ej. "estetoscopios" -> "Campímetro computarizado").
+Si ninguna capa da señal, se devuelve una lista de candidatos VACÍA a
+propósito — es mejor decir "no lo tenemos" que sugerir algo sin relación.
+Y nunca se deja pasar un nombre libre a la cotización (ese era el bug real:
+"estetoscopios" terminaba en el PDF con precio USD 0.00 porque no está en
+catálogo y nada lo bloqueaba).
 """
 import csv
 import difflib
@@ -83,6 +89,9 @@ _STOPWORDS = {
     "necesitaria", "quiero", "quisiera", "cotizar", "cotizacion", "cotización",
     "me", "interesa", "interesan", "ayudes", "ayuda", "q", "que", "busco",
     "deseo", "gustaria", "requiero", "hola", "mi", "tu", "su", "y", "o",
+    "tienes", "tiene", "tienen", "hay", "existe", "disponen", "disponible",
+    "disponibles", "cuentan", "cuenta", "algun", "alguna", "algo", "donde",
+    "manejas", "manejan", "ofrecen", "venden", "vendes",
 }
 
 
@@ -115,6 +124,93 @@ def _coincidencias_por_substring(texto_norm: str) -> list[Producto]:
     return [p for p, nombre_norm in zip(CATALOGO, _NOMBRES_NORM) if texto_norm in nombre_norm]
 
 
+# Preguntas tipo "¿tienen equipos para ginecología?" no buscan un PRODUCTO
+# por nombre, buscan un ÁREA CLÍNICA — y ninguna palabra de especialidad
+# aparece en los nombres de los 200 productos. Sin esto, el único recurso
+# era el fuzzy/semántico por texto, que para "ginecologia" devolvía cosas
+# sin relación real (ej. una centrífuga de laboratorio) solo porque el
+# vector/ratio de texto quedaba "medicamente parecido" en términos vagos.
+#
+# Alias hacia una `categoria` que ya existe tal cual en el catálogo:
+_CATEGORIA_ALIAS = {
+    "radiologia": "Diagnóstico por imagen", "imagenologia": "Diagnóstico por imagen",
+    "cirugia": "Quirúrgico", "quirofano": "Quirúrgico", "quirurgico": "Quirúrgico",
+    "urgencias": "Emergencia", "emergencias": "Emergencia",
+    "uci": "Cuidados críticos", "cuidados intensivos": "Cuidados críticos",
+    "terapia intensiva": "Cuidados críticos", "respiratorio": "Cuidados críticos",
+    "fisioterapia": "Rehabilitación", "fisiatria": "Rehabilitación",
+    "veterinaria": "Diagnóstico veterinario", "veterinario": "Diagnóstico veterinario",
+    "odontologia": "Odontología", "dental": "Odontología",
+    "oftalmologia": "Oftalmología", "ocular": "Oftalmología", "ojos": "Oftalmología",
+    "cardiologia": "Cardiología", "cardiaco": "Cardiología", "corazon": "Cardiología",
+    "neonatologia": "Neonatología", "recien nacidos": "Neonatología",
+    "dialisis": "Diálisis", "nefrologia": "Diálisis", "renal": "Diálisis",
+    "laboratorio": "Laboratorio", "esterilizacion": "Esterilización",
+    "bioseguridad": "Protección y bioseguridad", "proteccion": "Protección y bioseguridad",
+    "movilidad": "Movilidad y accesibilidad", "accesibilidad": "Movilidad y accesibilidad",
+    "ambulancia": "Transporte de pacientes", "traslado": "Transporte de pacientes",
+}
+
+# Especialidades que CRUZAN varias categorías del catálogo (no mapean a una
+# sola `categoria` del CSV) — curadas a mano con los productos realmente
+# usados en esa especialidad, no por parecido de texto.
+_ESPECIALIDAD_PRODUCTOS: dict[str, list[str]] = {
+    "ginecologia": [
+        "Ecógrafo portátil doppler color", "Ecógrafo de carro gama alta",
+        "Monitor fetal cardiotocógrafo", "Camilla de exploración eléctrica",
+        "Camilla de exploración manual",
+    ],
+    "obstetricia": [
+        "Ecógrafo portátil doppler color", "Monitor fetal cardiotocógrafo",
+        "Incubadora neonatal de transporte", "Cuna de calor radiante neonatal",
+    ],
+    "pediatria": [
+        "Básculas pediátricas digitales", "Monitor neonatal",
+        "Incubadora neonatal estacionaria", "Set de reanimación neonatal",
+        "Oxímetro neonatal de muñeca",
+    ],
+}
+
+_PALABRAS_ESPECIALIDAD = (
+    set(_CATEGORIA_ALIAS.keys())
+    | set(_ESPECIALIDAD_PRODUCTOS.keys())
+    | {_normalizar(p["categoria"]) for p in CATALOGO}
+)
+
+
+def _es_palabra_especialidad(texto_norm_sin_relleno: str) -> bool:
+    """True si, quitando relleno, lo que queda ES literalmente una palabra
+    de especialidad/categoría conocida (ej. "cirugia"). Sirve para decidir
+    el orden de resolución: "algo para cirugia" no debe resolverse por el
+    substring exacto solo porque "cirugia" aparece, por casualidad, dentro
+    del nombre de UN producto puntual no relacionado (Mesa de cirugía
+    veterinaria) — el cliente preguntó por el área, no por ese producto."""
+    return texto_norm_sin_relleno in _PALABRAS_ESPECIALIDAD
+
+
+def buscar_por_especialidad(texto: str, top_k: int = 5) -> list[Producto]:
+    """Productos relevantes para un área clínica mencionada por el cliente
+    (ginecología, radiología, UCI, etc.), no por similitud de texto contra
+    nombres de producto. Ver `_CATEGORIA_ALIAS`/`_ESPECIALIDAD_PRODUCTOS`."""
+    if not texto:
+        return []
+    t = _quitar_stopwords(_normalizar(texto))
+
+    for especialidad, nombres in _ESPECIALIDAD_PRODUCTOS.items():
+        if especialidad in t:
+            return [_POR_NOMBRE[n] for n in nombres if n in _POR_NOMBRE][:top_k]
+
+    for alias, categoria in _CATEGORIA_ALIAS.items():
+        if alias in t:
+            return [p for p in CATALOGO if p["categoria"] == categoria][:top_k]
+
+    for categoria in {p["categoria"] for p in CATALOGO}:
+        if _normalizar(categoria) in t:
+            return [p for p in CATALOGO if p["categoria"] == categoria][:top_k]
+
+    return []
+
+
 def _mejor_ratio(query_norm: str, nombre_norm: str) -> float:
     """Similitud por "ventana de palabras": en vez de comparar la consulta
     corta contra el nombre completo del catálogo (que puede tener 5-6
@@ -143,19 +239,33 @@ def _fuzzy_top(query_norm: str, top_k: int, cutoff: float) -> list[tuple[Product
     return puntajes[:top_k]
 
 
-def buscar_producto(texto: str) -> Optional[Producto]:
-    """Capas 1+2: substring exacto normalizado (si hay UNA sola coincidencia)
-    y, si no, fuzzy por ventana de palabras con un cutoff alto (0.8 — solo
-    typos claros, no coincidencias de casualidad). No depende de red — es la
-    que se usa siempre en modo offline.
+def _fuzzy_resolver(texto_norm: str, cutoff: float = 0.8, margen_empate: float = 0.03) -> tuple[Optional[Producto], list[Producto]]:
+    """(producto_confiable, candidatos_empatados). Una consulta de una sola
+    palabra genérica (ej. "ecografo") puede dar ratio ~1.0 contra VARIOS
+    nombres de catálogo a la vez (cada uno la contiene como ventana exacta)
+    — sin este chequeo de empate, `_fuzzy_top` elegía el primero por orden
+    de lista, adivinando entre opciones igual de válidas. Si hay empate, se
+    devuelven como candidatos en vez de autocompletar uno al azar."""
+    top = _fuzzy_top(texto_norm, top_k=5, cutoff=cutoff)
+    if not top:
+        return None, []
+    if len(top) == 1 or (top[0][1] - top[1][1]) >= margen_empate:
+        return top[0][0], []
+    empatados = [p for p, score in top if (top[0][1] - score) < margen_empate]
+    return None, empatados
 
-    Prueba primero el texto completo (para que escribir el nombre exacto del
-    catálogo, que a veces incluye palabras como "de", siga funcionando) y
-    luego, si no hubo señal, el texto sin palabras de relleno ("quiero un
-    ecografo portatil" -> "ecografo portatil"). Si el substring matchea más
-    de un producto (ej. "monitor" matchea 15), se considera ambiguo a
-    propósito: quien llama debe usar `resolver_equipo`/`sugerir_candidatos`
-    para ofrecer opciones en vez de que esta función adivine una."""
+
+def _buscar_por_substring_unico(texto: str) -> Optional[Producto]:
+    """Solo la capa 1 (substring exacto, instantáneo). Devuelve el producto
+    únicamente si hay EXACTAMENTE una coincidencia; None si hay 0 o si es
+    ambiguo (varias) — en ningún caso adivina.
+
+    Si una variante del texto ES literalmente una palabra de especialidad
+    (ej. "cirugia"), se omite esa variante aquí: aunque por casualidad
+    aparezca dentro del nombre de un solo producto puntual ("Mesa de
+    cirugía veterinaria"), el cliente preguntó por el área clínica, no por
+    ese producto — eso lo resuelve `buscar_por_especialidad` en
+    `resolver_equipo`."""
     if not texto:
         return None
     t = _expandir_abreviaturas(_normalizar(texto))
@@ -163,50 +273,52 @@ def buscar_producto(texto: str) -> Optional[Producto]:
     variantes = [t] if t_sin_relleno == t else [t, t_sin_relleno]
 
     for v in variantes:
+        if _es_palabra_especialidad(v):
+            continue
         directos = _coincidencias_por_substring(v)
         if len(directos) == 1:
             return directos[0]
         if len(directos) > 1:
             return None
+    return None
 
-    top = _fuzzy_top(variantes[-1], top_k=1, cutoff=0.8)
-    return top[0][0] if top else None
+
+def buscar_producto(texto: str) -> Optional[Producto]:
+    """Capas 1+2: substring exacto normalizado (si hay UNA sola coincidencia)
+    y, si no, fuzzy por ventana de palabras con un cutoff alto (0.8 — solo
+    typos claros, no coincidencias de casualidad). No depende de red — es la
+    que se usa siempre en modo offline. Para el orden completo que también
+    considera especialidad clínica antes del fuzzy, ver `resolver_equipo`."""
+    producto = _buscar_por_substring_unico(texto)
+    if producto:
+        return producto
+
+    t = _quitar_stopwords(_expandir_abreviaturas(_normalizar(texto)))
+    producto, _empatados = _fuzzy_resolver(t)
+    return producto
 
 
 def sugerir_candidatos(texto: str, top_k: int = 3) -> list[Producto]:
-    """Candidatos "parecidos pero no confirmados", para ofrecer como opciones
-    cuando no hay un match confiable (incluye el caso ambiguo: varias
-    coincidencias por substring). Orden: substring ambiguo -> semántico (si
-    hay API key, es más confiable para distinguir "typo de un producto real"
-    de "producto que de verdad no vendemos") -> fuzzy de texto como último
-    recurso, con un cutoff moderado para no sugerir "cosas ridículas"."""
+    """Candidatos "parecidos pero no confirmados", SOLO para el caso en que
+    el texto del cliente matchea por substring más de un producto a la vez
+    (ambiguo de verdad, ej. "monitor" calza en 15 nombres: son variantes
+    reales del mismo tipo de producto). A propósito NO mete aquí relleno de
+    semántico/fuzzy débil: esos scores intermedios eran exactamente lo que
+    producía recomendaciones sin relación real (ej. "estetoscopios" ->
+    "Campímetro computarizado"). Para preguntas por área clínica en vez de
+    producto, ver `buscar_por_especialidad`; para typos claros de un
+    producto puntual, `buscar_producto` ya los resuelve directo."""
     if not texto:
         return []
     t = _expandir_abreviaturas(_normalizar(texto))
     t_sin_relleno = _quitar_stopwords(t)
     variantes = [t] if t_sin_relleno == t else [t, t_sin_relleno]
 
-    vistos: dict[str, Producto] = {}
     for v in variantes:
-        for p in _coincidencias_por_substring(v)[:top_k]:
-            vistos[p["nombre"]] = p
-        if vistos:
-            break
-
-    if len(vistos) < top_k:
-        try:
-            from app.catalog_search import buscar_semantico
-            for p, score in buscar_semantico(texto, top_k=top_k):
-                if score >= 0.35:
-                    vistos[p["nombre"]] = p
-        except Exception:
-            pass  # sin API key, sin red, o cache no disponible: se sigue con el fuzzy
-
-    if len(vistos) < top_k:
-        for p, _score in _fuzzy_top(variantes[-1], top_k=top_k, cutoff=0.55):
-            vistos[p["nombre"]] = p
-
-    return list(vistos.values())[:top_k]
+        directos = _coincidencias_por_substring(v)[:top_k]
+        if directos:
+            return directos
+    return []
 
 
 def resolver_equipo(texto: str) -> tuple[Optional[Producto], list[Producto]]:
@@ -216,10 +328,34 @@ def resolver_equipo(texto: str) -> tuple[Optional[Producto], list[Producto]]:
       su nombre exacto.
     - Si es None, NUNCA se debe guardar el texto libre del cliente como
       "equipo" — en su lugar, usar `candidatos` para ofrecer opciones (o
-      decir que no está disponible, si `candidatos` viene vacío)."""
-    producto = buscar_producto(texto)
+      decir que no está disponible, si `candidatos` viene vacío). Los
+      candidatos solo se ofrecen cuando hay una relación real con lo que
+      pidió el cliente (variantes del mismo producto, o productos de la
+      especialidad clínica mencionada) — si no hay ninguna señal confiable,
+      se devuelve lista vacía a propósito en vez de forzar una sugerencia.
+
+    Orden importante: el substring EXACTO va primero (si el cliente tipeó
+    el nombre del producto, eso manda); la especialidad clínica va ANTES
+    del fuzzy/semántico, porque si no, una palabra como "pediatria" o
+    "cirugia" puede "parecerse" por texto a un producto puntual (ej.
+    "Básculas pediátricas", "Mesa de cirugía veterinaria") y quedar
+    auto-seleccionada cuando el cliente en realidad preguntaba por el área
+    completa, no por ese producto específico (ver la guarda de palabras de
+    especialidad dentro de `_buscar_por_substring_unico`)."""
+    producto = _buscar_por_substring_unico(texto)
     if producto:
         return producto, []
+
+    candidatos_especialidad = buscar_por_especialidad(texto)
+    if candidatos_especialidad:
+        return None, candidatos_especialidad
+
+    t = _quitar_stopwords(_expandir_abreviaturas(_normalizar(texto)))
+    producto_fuzzy, candidatos_empate = _fuzzy_resolver(t)
+    if producto_fuzzy:
+        return producto_fuzzy, []
+    if candidatos_empate:
+        return None, candidatos_empate
 
     try:
         from app.catalog_search import buscar_semantico

@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field
 
 from app.config import settings, logger, OFFLINE_MODE
 from app.state import Requerimientos
-from app.catalog import resolver_equipo, producto_exacto, listar_categorias_texto
+from app.catalog import resolver_equipo, producto_exacto
 
 CAMPOS_REQUERIDOS = ["equipo", "cantidad", "ciudad_entrega", "nombre_contacto", "correo_o_telefono"]
 
@@ -96,10 +96,7 @@ def extraer_offline(mensaje: str, req_previo: Requerimientos) -> tuple[Requerimi
                 f"parecidas?: {opciones}. Si ninguna calza, cuéntame con otras palabras qué necesitas."
             )
         else:
-            return req, (
-                f"Por ahora no tenemos «{mensaje.strip()}» en catálogo. Trabajamos equipos de estas áreas: "
-                f"{listar_categorias_texto()}. ¿Cuál de estas te interesa?"
-            )
+            return req, f"Por ahora no tenemos «{mensaje.strip()}» en catálogo. ¿Hay otro equipo que te interese cotizar?"
     elif campo_pendiente == "cantidad":
         digitos = "".join(ch for ch in mensaje if ch.isdigit())
         req["cantidad"] = int(digitos) if digitos else 1
@@ -142,14 +139,11 @@ def extraer_llm(mensaje: str, req_previo: Requerimientos, historial: list[dict])
         elif candidatos:
             lista = "\n".join(f'- "{p["nombre"]}" (USD {p["precio_usd"]:,.2f})' for p in candidatos)
             bloque_candidatos = (
-                "No hay coincidencia exacta, pero estos productos del catálogo se parecen a lo que "
-                f"pide el cliente:\n{lista}"
+                "No hay coincidencia exacta, pero estos productos del catálogo tienen relación real con "
+                f"lo que pide el cliente (variantes del mismo tipo o de la misma área clínica):\n{lista}"
             )
         else:
-            bloque_candidatos = (
-                "Ningún producto del catálogo coincide con lo que pide el cliente. Áreas disponibles: "
-                f"{listar_categorias_texto()}."
-            )
+            bloque_candidatos = "SIN_COINCIDENCIAS: ningún producto del catálogo tiene relación real con el mensaje del cliente."
 
     prompt = f"""Eres el asistente virtual de cotizaciones de {settings.app_name}, un
 canal de atención comercial para clientes que buscan equipos médicos.
@@ -164,14 +158,27 @@ Historial reciente:
 
 Nuevo mensaje del cliente: "{mensaje}"
 
-REGLA DE CATÁLOGO (muy importante, evita inventar productos que no vendemos):
+PRIMERO DECIDE: ¿el mensaje del cliente tiene algo que ver con pedir o
+preguntar por un equipo médico?
+- Si NO tiene nada que ver (pide código de programación, ayuda con otro
+  tema, chistes, preguntas generales, etc.): respóndele en una frase simple
+  y breve que tu función es ayudar con cotizaciones de equipos médicos y
+  que no puedes ayudarle con eso. NO menciones catálogo, NO menciones
+  "no está disponible", NO recomiendes ningún producto — simplemente no
+  viene al caso. Deja "equipo" vacío.
+- Si SÍ es sobre equipos médicos, sigue la REGLA DE CATÁLOGO de abajo.
+
+REGLA DE CATÁLOGO (muy importante, evita inventar o recomendar productos
+sin relación real con lo que pidió el cliente):
 - El campo "equipo" SOLO puede quedar con el nombre EXACTO de un producto
-  que aparezca arriba como "Coincidencia exacta" o en los candidatos
-  sugeridos — cópialo tal cual, sin cambiar ni una palabra ni traducirlo.
-- Si no hay coincidencia exacta y el cliente todavía no confirmó ninguno de
-  los candidatos sugeridos, deja "equipo" vacío (null) y en tu respuesta
-  ofrece esas opciones; si no hay candidatos, dile con calidez que ese
-  producto no está en catálogo y menciona las áreas disponibles.
+  que aparezca arriba como "Coincidencia exacta" o en la lista de productos
+  con relación real — cópialo tal cual, sin cambiar ni una palabra.
+- Si hay varios en la lista, pregúntale al cliente cuál de esos prefiere —
+  no elijas tú por él.
+- Si ves la marca SIN_COINCIDENCIAS arriba: dile con calidez y en pocas
+  palabras que ese producto no está en catálogo. NO le ofrezcas otros
+  productos al azar — recomendar algo sin relación real es peor que no
+  recomendar nada. Está bien simplemente decir que no lo tienes.
 - Nunca completes "equipo" con el texto libre del cliente ni con un
   producto que no esté en la lista de candidatos.
 
