@@ -12,7 +12,7 @@ Tiene dos modos:
 from typing import Optional
 from pydantic import BaseModel, Field
 
-from app.config import settings, OFFLINE_MODE
+from app.config import settings, logger, OFFLINE_MODE
 from app.state import Requerimientos
 from app.catalog import CATALOGO, buscar_producto, listar_catalogo_texto
 
@@ -176,4 +176,7 @@ def extraer_requerimientos(mensaje: str, req_previo: Requerimientos, historial: 
     except Exception:
         # Contingencia: si falla la llamada al LLM (sin internet, cuota agotada,
         # error de red durante la demo en vivo), se cae al guion determinístico.
+        # Se deja registrado el motivo real en logs para poder diagnosticarlo
+        # (ver Render -> servicio -> Logs) en vez de fallar en silencio.
+        logger.exception("extraer_llm falló, usando modo offline de contingencia")
         return extraer_offline(mensaje, req_previo)
